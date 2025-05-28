@@ -56,14 +56,6 @@ int main()
         std::cout << "ClientInfo: " << clientIP << ":" << clientPort << std::endl;
     
         char buff[1024];
-        // while (true) {
-        //     ssize_t n = recv(clientSock, buff, sizeof(buff), 0);
-        //     if (n <= 0) break; // 错误或连接关闭
-        //     request.append(buff, n);
-        //     if (request.find("\r\n\r\n") != std::string::npos) {
-        //         break; // 完整请求已接收
-        //     }
-        // }
         size_t byteRead = recv(clientSock, buff, sizeof(buff), 0);
         if (byteRead < 0)
         {

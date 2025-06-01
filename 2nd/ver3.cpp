@@ -4,9 +4,23 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <assert.h>
+#include <signal.h>
+#include <atomic>
 
+std::atomic<bool> bStopServer(false);
+
+void signalHandler(int signal)
+{
+    if (signal == SIGINT || signal == SIGHUP || signal == SIGTERM)
+    {
+        std::cout << "\nServer is shutting down..." << std::endl;
+        bStopServer = true;
+    }
+}
 int main()
 {
+    signal(SIGINT, signalHandler);
+    
     int serviceSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (serviceSock == -1)
     {
@@ -42,7 +56,7 @@ int main()
     std::cout << "Server is running on port 8080..." << std::endl;
 
     //加入while循环 可以让服务器一直接受客户端的请求
-    while (true)
+    while (!bStopServer)
     {
         struct sockaddr_in clientAddr;
         memset(&clientAddr, 0 , sizeof(clientAddr));
@@ -90,4 +104,6 @@ int main()
  
     }
     close(serviceSock); //问题：seviceSock不会被释放
+    std::cout << "Server socket closed. Exiting." << std::endl;
+    return 0;
 }
